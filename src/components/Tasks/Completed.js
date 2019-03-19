@@ -1,18 +1,43 @@
-import React from 'react';
-import {Card, Button} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Card, Button } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import { completeTask, deleteTask } from '../../actions/tasks';
 
-const CompletedTasks = props => {
-    return(
-            <div style={{margin:'1rem',padding:'1rem',border:'1px solid #007bff'}}>
-                    <h2>Completed Tasks</h2>
-                    <Card className="mx-5"style={{width:'35rem'}}>
-                            <Card.Body>
-                                <Card.Title>Task 1</Card.Title>
-                                <Button variant="secondary" className="px-4">Delete</Button>
-                            </Card.Body>
-                    </Card>
-            </div>
-    )
+class CompletedTasks extends Component {
+        handleComplete = e => {
+                const id = e.target.dataset.id;
+                this.props.completeTask(id);
+        } 
+        handleDelete = e => {
+                const id = e.target.dataset.id;
+                this.props.deleteTask(id);
+        } 
+
+        render() {
+                return (
+                        this.props.data.map(t => 
+                                
+                                 <Card key={t.id} className="mx-5" style={{ width: '35rem' }}>
+                                        <Card.Body>
+                                                <Card.Title>{t.text}</Card.Title>
+                                                <Button variant="primary" className="px-4" onClick={this.handleComplete} data-id={t.id}>uncomplete</Button>
+                                                <Button variant="secondary" className="px-4" onClick={this.handleDelete} data-id={t.id}>Delete</Button>
+                                        </Card.Body>
+                                </Card>
+                        )
+                
+                )
+        }
+
 }
 
-export default CompletedTasks;
+const mapStateToProps = state => ({
+        data: state.data.filter(t => t.completed && !t.deleted),
+    });
+
+const mapDispatchToProps = dispatch => ({
+        completeTask: id => dispatch(completeTask(id)),
+        deleteTask:id => dispatch(deleteTask(id)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CompletedTasks);
