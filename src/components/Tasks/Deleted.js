@@ -1,36 +1,35 @@
 import React,{Component} from 'react';
 import {Card, Button} from 'react-bootstrap';
-import {connect} from 'react-redux';
-import {deleteTask} from '../../actions/tasks';
+import {MyContext} from '../../App';
 
 class DeletedTasks extends Component {
 
-    handleDelete = e => {
-        const id = e.target.dataset.id;
-        this.props.deleteTask(id);
-    } 
+    deletedTaskId = (handleDelete) => (e) => {
+        const did = e.target.dataset.id;
+        handleDelete(did);
+    }
+    
     render(){
             return (
-                this.props.data.map(t => 
+                <MyContext.Consumer>
+                {
+                value => (
+                value.state.data.filter(t => (t.deleted)).map(t => 
                                 
                     <Card key={t.id} className="mx-5" style={{ width: '35rem' }}>
                         <Card.Body>
                             <Card.Title>{t.text}</Card.Title>
-                                <Button variant="secondary" className="px-4" onClick={this.handleDelete} data-id={t.id}>Restore</Button>
+                                <Button variant="secondary" className="px-4" onClick={this.deletedTaskId(value.handleDelete)} data-id={t.id}>Restore</Button>
                         </Card.Body>
                    </Card>
-            )
+                )
+                )
+                }
+                </MyContext.Consumer>
             )
         }
 
     }
 
-const mapStateToProps = state => ({
-    data: state.data.filter(t => t.deleted),
-});
 
-const mapDispatchToProps = dispatch => ({
-    deleteTask: id => dispatch(deleteTask(id)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(DeletedTasks);
+export default DeletedTasks;

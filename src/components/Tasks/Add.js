@@ -1,11 +1,10 @@
-import React,{ Component} from 'react';
-import {connect} from 'react-redux';
+import React, { Component } from 'react';
 import uuidv4 from 'uuid/v4';
-import {Form, FormControl, Button} from 'react-bootstrap';
-import {addTask} from '../../actions/tasks';
+import { Form, FormControl, Button } from 'react-bootstrap';
 import '../../../node_modules/bootstrap/dist/css/bootstrap.css';
+import { MyContext } from '../../App';
 
- class AddTask extends Component{
+class AddTask extends Component {
 
     state = {
         task: '',
@@ -13,31 +12,31 @@ import '../../../node_modules/bootstrap/dist/css/bootstrap.css';
 
     handleChange = (e) => {
         const value = e.target.value;
-        this.setState({text: value});
+        this.setState({ text: value });
     }
 
-    
-    handleSubmit = (e) => {
-        e.preventDefault(); 
-        if(!this.state.text) return;
-        const task = { text: this.state.text, completed: false, deleted: false, id: uuidv4()}
-        this.props.addTask(task);
-        this.setState({text: ''});
+
+    handleSubmit = addTask => (e) => {
+        e.preventDefault();
+        if (!this.state.text) return;
+        const task = { text: this.state.text, completed: false, deleted: false, id: uuidv4() }
+        addTask(task);
+        this.setState({ text: '' });
     }
 
-    render(){
-        return (<>
-        <Form onSubmit={this.handleSubmit}>
-            <FormControl  placeholder="Task Title" onChange={this.handleChange} value={this.state.text || ''}/>
-            <Button type="submit" variant="primary">Add Task</Button>
-        </Form>
-       </>)
+    render() {
+        return (
+            <MyContext.Consumer>
+                {
+                    value => (
+                        <Form onSubmit={this.handleSubmit(value.addTask)}>
+                            <FormControl placeholder="Task Title" onChange={this.handleChange} value={this.state.text || ''} />
+                            <Button type="submit" variant="primary">Add Task</Button>
+                        </Form>
+                    )
+                }
+            </MyContext.Consumer>)
     }
 
 }
- 
-const mapDispatchToProps = dispatch => ({
-       addTask: data => dispatch(addTask(data)),
-   });
-  
-export default connect(null, mapDispatchToProps)(AddTask);
+export default AddTask;
